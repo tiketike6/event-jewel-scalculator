@@ -1,0 +1,24 @@
+{
+    "name": "event-jewels-calculator",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tiketike6/event-jewels-calculator.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/tiketike6/event-jewels-calculator/issues"
+    },
+    "homepage": "https://github.com/tiketike6/event-jewels-calculator#readme",
+    "devDependencies": {
+        "@cybozu/eslint-config": "^14.0.2",
+        "eslint": "^7.32.0",
+        "prettier": "^2.3.2"
+    }
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="viewport" content="width=device-width" />
+        <link href="src/stylesheet.css" rel="stylesheet" />
+        <title>イベントに必要なジュエル計算機</title>
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <td>日時</td>
+                <td>:</td>
+                <td><input type="datetime-local" id="datetimeStart" /> ～ <input type="datetime-local" id="datetimeEnd" /></td>
+            </tr>
+            <tr>
+                <td>消費スタミナ（元気）</td>
+                <td>:</td>
+                <td><input type="number" id="consumedStamina" style="width: 4em" /></td>
+            </tr>
+            <tr>
+                <td>スタミナ（元気）</td>
+                <td>:</td>
+                <td><input type="number" id="stamina" style="width: 4em" /> / <input type="number" id="maxStamina" style="width: 4em" /></td>
+            </tr>
+            <tr>
+                <td>自然回復日時</td>
+                <td>:</td>
+                <td id="naturalRecoveryAt"></td>
+            </tr>
+            <tr>
+                <td>要回復スタミナ（元気）</td>
+                <td>:</td>
+                <td id="requiredRecoveryStamina"></td>
+            </tr>
+            <tr>
+                <td>回復アイテム</td>
+                <td>:</td>
+                <td>
+                    <table class="solid">
+                        <tr>
+                            <td></td>
+                            <td>所持数</td>
+                            <td>デイリー獲得数</td>
+                            <td>消費数</td>
+                        </tr>
+                        <tr>
+                            <td>ドリンク10</td>
+                            <td><input type="number" id="possession_drink10" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drink10" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drink10"></td>
+                        </tr>
+                        <tr>
+                            <td>ドリンク20</td>
+                            <td><input type="number" id="possession_drink20" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drink20" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drink20"></td>
+                        </tr>
+                        <tr>
+                            <td>ドリンク30</td>
+                            <td><input type="number" id="possession_drink30" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drink30" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drink30"></td>
+                        </tr>
+                        <tr>
+                            <td>ドリンク50</td>
+                            <td><input type="number" id="possession_drink50" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drink50" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drink50"></td>
+                        </tr>
+                        <tr>
+                            <td>ドリンク100</td>
+                            <td><input type="number" id="possession_drink100" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drink100" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drink100"></td>
+                        </tr>
+                        <tr>
+                            <td>ドリンクMAX</td>
+                            <td><input type="number" id="possession_drinkMax" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_drinkMax" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_drinkMax"></td>
+                        </tr>
+                        <tr class="stripe">
+                            <td>その他100</td>
+                            <td><input type="number" id="possession_other100" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_other100" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_other100"></td>
+                        </tr>
+                        <tr class="stripe">
+                            <td>その他MAX</td>
+                            <td><input type="number" id="possession_otherMax" style="width: 4em" /> 個</td>
+                            <td><input type="number" id="dailyEarn_otherMax" style="width: 4em" /> 個 / 日</td>
+                            <td id="consumed_otherMax"></td>
+                        </tr>
+                    </table>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>消費ジュエル</td>
+                <td>:</td>
+                <td id="consumedJewel">
+                    <span class="cgColor">
+                        スタージュエル
+                        <span id="consumedJewelForStarlightStage"> </span>
+                        個
+                    </span>
+                    または
+                    <span class="mlColor">
+                        ミリオンジュエル
+                        <span id="consumedJewelForTheaterDays"> </span>
+                        個
+                    </span>
+                </td>
+            </tr>
+        </table>
+        <div>
+            デイリー獲得数参考値
+            <table class="solid">
+                <tr>
+                    <td class="cgBackground" rowspan="3">デレステ</td>
+                    <td>デイリーミッション</td>
+                    <td>ドリンク30 × 1個</td>
+                </tr>
+                <tr class="stripe">
+                    <td>
+                        アタポン形式 <br />
+                        LIVE Carnival
+                    </td>
+                    <td>なし</td>
+                </tr>
+                <tr class="stripe">
+                    <td>
+                        LIVE Groove <br />
+                        LIVE Parade <br />
+                        シンデレラキャラバン <br />
+                        ススメ！シンデレラロード
+                    </td>
+                    <td>当日限定ドリンク50 × 1個</td>
+                </tr>
+                <tr>
+                    <td class="mlBackground" rowspan="6">ミリシタ</td>
+                    <td>デイリーミッション</td>
+                    <td>ドリンク20 × 1個</td>
+                </tr>
+                <tr class="stripe">
+                    <td>
+                        プラチナスターシアター <br />
+                        プラチナスターツアー <br />
+                        プラチナスターツインステージ <br />
+                        プラチナスターチューン
+                    </td>
+                    <td>なし</td>
+                </tr>
+                <tr class="stripe">
+                    <td>プラチナスターテール</td>
+                    <td>
+                        当日限定ドリンク30 × 4個 <br />
+                        ※うち1個はミッション
+                    </td>
+                </tr>
+                <tr class="stripe">
+                    <td>
+                        ミリコレ！ <br />
+                        MILLION LIVE WORKING☆ <br />
+                        THEATER TALK PARTY☆
+                    </td>
+                    <td>
+                        当日限定ドリンク30 × 6個 <br />
+                        ※うち4個はミッション
+                    </td>
+                </tr>
+                <tr class="stripe">
+                    <td>THEATER SHOW TIME☆</td>
+                    <td>当日限定ドリンク30 × 2個</td>
+                </tr>
+                <tr class="stripe">
+                    <td>周年</td>
+                    <td>
+                        当日限定ドリンク30 × 2個 <br />
+                        ※2個ともミッション
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <button id="update">更新</button> <button id="save">保存</button>
+            <label for="autoSave"> <input type="checkbox" id="autoSave" /> 自動保存 </label>
+        </div>
+        <div>保存日時 : <span id="datetimeSave"> 未保存 </span></div>
+        <div>
+            <button id="clearInput">入力を初期化</button> <button id="loadSave" disabled>保存した値を読込</button>
+            <button id="clearSave" disabled>保存した値を削除</button>
+        </div>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.6/dayjs.min.js"
+            integrity="sha512-bwD3VD/j6ypSSnyjuaURidZksoVx3L1RPvTkleC48SbHCZsemT3VKMD39KknPnH728LLXVMTisESIBOAb5/W0Q=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.6/locale/ja.min.js"
+            integrity="sha512-Wnlqvn3V+CPGlJmU+hUsxrDp3S4KKIF7eqlYbPOtAipIOQRHTjk1oZuXvRfaFOZhGmw6leo/V5SqES583KTUDg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script src="src/script.js" type="text/javascript"></script>
+    </body>
+</html>
