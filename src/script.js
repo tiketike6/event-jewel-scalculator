@@ -224,8 +224,12 @@
         }
 
         // 消費ジュエル
-        const consumedJewelForStarlightStage = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / 10) * Math.floor(500 / formValue.maxStamina);
-        const consumedJewelForTheaterDays = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / formValue.maxStamina) * 50;
+        let consumedJewelForStarlightStage = 0;
+        let consumedJewelForTheaterDays = 0;
+        if (requiredRecoveryStaminaAfterItemRecovered > 100) {
+            consumedJewelForStarlightStage = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / 10) * Math.floor(500 / formValue.maxStamina);
+            consumedJewelForTheaterDays = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / formValue.maxStamina) * 50;
+        }
 
         // 表示
         Object.keys(recoveryItems).forEach((item) => {
