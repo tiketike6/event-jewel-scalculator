@@ -357,5 +357,6 @@
         Object.keys(data).forEach((key) => {
             $(`#${key}`).val(data[key]);
         });
+        calculate();
     }
 })();
