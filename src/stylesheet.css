@@ -90,6 +90,7 @@ button:disabled {
     color: rgb(64, 64, 64);
     cursor: not-allowed;
 }
+.subtractTourTimes,
 .subtractLiveTimes,
 .subtractWorkTimes,
 .subtractTicketLiveTimes,
@@ -98,6 +99,7 @@ button:disabled {
     padding: 0;
     color: rgb(255, 0, 0);
 }
+.addTourTimes,
 .addLiveTimes,
 .addWorkTimes,
 .addTicketLiveTimes,
@@ -119,4 +121,11 @@ button:disabled {
 }
 .danger {
     color: rgb(255, 0, 0);
+}
+.vertical {
+    writing-mode: vertical-rl;
+    vertical-align: middle;
+}
+td a {
+    color: inherit;
 }
