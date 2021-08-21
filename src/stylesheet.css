@@ -53,14 +53,14 @@ table.solid td {
     color: rgb(255, 255, 255);
 }
 .mlBackground {
-    background-color: rgba(255, 192, 0);
+    background-color: rgb(255, 192, 0);
     color: rgb(255, 255, 255);
 }
 .cgColor {
     color: rgb(0, 128, 192);
 }
 .mlColor {
-    color: rgba(255, 192, 0);
+    color: rgb(255, 192, 0);
 }
 .stripe {
     background-color: rgba(128, 128, 128, 0.25);

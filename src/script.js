@@ -276,7 +276,7 @@
             saveData[`dailyEarn${item}`] = $(`#dailyEarn${item}`).val();
         });
 
-        localStorage.setItem(location.href, JSON.stringify(saveData));
+        localStorage.setItem(location.href.replace(location.search, ''), JSON.stringify(saveData));
 
         $('#datetimeSave').text(datetimeSave);
         $('#loadSave').prop('disabled', false);
@@ -303,7 +303,7 @@
 
     // 保存した値を読込ボタン
     function loadSavedData() {
-        const savedString = localStorage.getItem(location.href);
+        const savedString = localStorage.getItem(location.href.replace(location.search, ''));
 
         if (!savedString) {
             return false;
@@ -334,7 +334,7 @@
 
     // 保存した値を削除ボタン
     $('#clearSave').click(() => {
-        localStorage.removeItem(location.href);
+        localStorage.removeItem(location.href.replace(location.search, ''));
 
         $('#datetimeSave').text('削除済');
         $('#loadSave').prop('disabled', true);
