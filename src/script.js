@@ -143,37 +143,66 @@
         // 回復アイテム消費数の最適化
         function calcConsumedRecoveryItems(using, requiredRecovery) {
             const consumed = {};
-            const maxConsumed = {};
             const bestConsumed = {};
             Object.keys(recoveryItems).forEach((item) => {
                 consumed[item] = 0;
-                maxConsumed[item] = formValue[`${using}${item}`];
                 bestConsumed[item] = formValue[`${using}${item}`];
             });
             let minRecoveredStamina = Infinity;
-            for (consumed._drink100 = maxConsumed._drink100; consumed._drink100 >= 0; consumed._drink100--) {
-                for (consumed._drink50 = maxConsumed._drink50; consumed._drink50 >= 0; consumed._drink50--) {
-                    for (consumed._drink30 = maxConsumed._drink30; consumed._drink30 >= 0; consumed._drink30--) {
-                        for (consumed._drink20 = maxConsumed._drink20; consumed._drink20 >= 0; consumed._drink20--) {
-                            for (consumed._drink10 = maxConsumed._drink10; consumed._drink10 >= 0; consumed._drink10--) {
-                                let recoveredStamina = 0;
-                                Object.keys(recoveryItems).forEach((item) => {
-                                    recoveredStamina += recoveryItems[item] * consumed[item];
-                                });
-                                if (recoveredStamina === requiredRecovery) {
-                                    // 回復量が消費量と同じなら無駄ゼロ
-                                    return consumed;
-                                }
-                                if (recoveredStamina < requiredRecovery) {
-                                    // 回復量が消費量未満なら達成不能
-                                    continue;
-                                }
-                                if (recoveredStamina < minRecoveredStamina) {
-                                    // 回復量が最小なら格納
-                                    minRecoveredStamina = recoveredStamina;
-                                    Object.keys(recoveryItems).forEach((item) => {
-                                        bestConsumed[item] = consumed[item];
-                                    });
+
+            // 消費数の最大値を取得
+            function calcMaxConsumedRecoveryItems(targetItem) {
+                let required = requiredRecovery;
+                let isSkip = false;
+                Object.keys(recoveryItems).forEach((item) => {
+                    if (item === targetItem) isSkip = true;
+                    if (isSkip) return;
+                    required -= recoveryItems[item] * consumed[item];
+                });
+                if (required < 0) required = 0;
+                if (required < formValue[`${using}${targetItem}`] * recoveryItems[targetItem]) {
+                    return Math.ceil(required / recoveryItems[targetItem]);
+                }
+                return formValue[`${using}${targetItem}`];
+            }
+
+            for (consumed._drink100 = calcMaxConsumedRecoveryItems('_drink100'); consumed._drink100 >= 0; consumed._drink100--) {
+                for (consumed._drink50 = calcMaxConsumedRecoveryItems('_drink50'); consumed._drink50 >= 0; consumed._drink50--) {
+                    for (consumed._drink30 = calcMaxConsumedRecoveryItems('_drink30'); consumed._drink30 >= 0; consumed._drink30--) {
+                        for (consumed._drink20 = calcMaxConsumedRecoveryItems('_drink20'); consumed._drink20 >= 0; consumed._drink20--) {
+                            for (consumed._drink10 = calcMaxConsumedRecoveryItems('_drink10'); consumed._drink10 >= 0; consumed._drink10--) {
+                                for (consumed._drinkMax = calcMaxConsumedRecoveryItems('_drinkMax'); consumed._drinkMax >= 0; consumed._drinkMax--) {
+                                    for (
+                                        consumed._other100 = calcMaxConsumedRecoveryItems('_other100');
+                                        consumed._other100 >= 0;
+                                        consumed._other100--
+                                    ) {
+                                        for (
+                                            consumed._otherMax = calcMaxConsumedRecoveryItems('_otherMax');
+                                            consumed._otherMax >= 0;
+                                            consumed._otherMax--
+                                        ) {
+                                            let recoveredStamina = 0;
+                                            Object.keys(recoveryItems).forEach((item) => {
+                                                recoveredStamina += recoveryItems[item] * consumed[item];
+                                            });
+                                            if (recoveredStamina === requiredRecovery) {
+                                                // 回復量が消費量と同じなら無駄ゼロ
+                                                return consumed;
+                                            }
+                                            if (recoveredStamina < requiredRecovery) {
+                                                // 回復量が消費量未満なら達成不能
+                                                continue;
+                                            }
+                                            if (recoveredStamina < minRecoveredStamina) {
+                                                // 回復量が最小なら格納
+                                                minRecoveredStamina = recoveredStamina;
+                                                Object.keys(recoveryItems).forEach((item) => {
+                                                    bestConsumed[item] = consumed[item];
+                                                });
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -185,50 +214,25 @@
 
         // デイリー獲得アイテムの消費数
         let requiredRecoveryStamina = formValue.requiredRecoveryStamina;
+        const bestConsumedDailyEarn = calcConsumedRecoveryItems('sumDailyEarn', formValue.requiredRecoveryStamina);
         Object.keys(recoveryItems).forEach((item) => {
-            let sumDailyEarn = formValue[`sumDailyEarn${item}`];
-            formValue[`consumedDailyEarn${item}`] = 0;
-            while (requiredRecoveryStamina > 0 && sumDailyEarn > 0) {
-                requiredRecoveryStamina -= recoveryItems[item];
-                sumDailyEarn--;
-                formValue[`consumedDailyEarn${item}`]++;
-            }
+            formValue[`consumedDailyEarn${item}`] = bestConsumedDailyEarn[item];
+            requiredRecoveryStamina -= recoveryItems[item] * bestConsumedDailyEarn[item];
         });
-        if (!formValue.consumedDailyEarn_drinkMax && !formValue.consumedDailyEarn_other100 && !formValue.consumedDailyEarn_otherMax) {
-            const bestConsumed = calcConsumedRecoveryItems('sumDailyEarn', formValue.requiredRecoveryStamina);
-            requiredRecoveryStamina = formValue.requiredRecoveryStamina;
-            Object.keys(recoveryItems).forEach((item) => {
-                formValue[`consumedDailyEarn${item}`] = bestConsumed[item];
-                requiredRecoveryStamina -= recoveryItems[item] * bestConsumed[item];
-            });
-        }
 
         // 回復アイテムの消費数
-        let requiredRecoveryStaminaAfterItemRecovered = requiredRecoveryStamina;
+        const bestConsumedPossession = calcConsumedRecoveryItems('possession', requiredRecoveryStamina);
         Object.keys(recoveryItems).forEach((item) => {
-            let possession = formValue[`possession${item}`];
-            formValue[`consumedPossession${item}`] = 0;
-            while (requiredRecoveryStaminaAfterItemRecovered > 0 && possession > 0) {
-                requiredRecoveryStaminaAfterItemRecovered -= recoveryItems[item];
-                possession--;
-                formValue[`consumedPossession${item}`]++;
-            }
+            formValue[`consumedPossession${item}`] = bestConsumedPossession[item];
+            requiredRecoveryStamina -= recoveryItems[item] * bestConsumedPossession[item];
         });
-        if (!formValue.consumedPossession_drinkMax && !formValue.consumedPossession_other100 && !formValue.consumedPossession_otherMax) {
-            const bestConsumed = calcConsumedRecoveryItems('possession', requiredRecoveryStamina);
-            requiredRecoveryStaminaAfterItemRecovered = requiredRecoveryStamina;
-            Object.keys(recoveryItems).forEach((item) => {
-                formValue[`consumedPossession${item}`] = bestConsumed[item];
-                requiredRecoveryStaminaAfterItemRecovered -= recoveryItems[item] * bestConsumed[item];
-            });
-        }
 
         // 消費ジュエル
         let consumedJewelForStarlightStage = 0;
         let consumedJewelForTheaterDays = 0;
-        if (requiredRecoveryStaminaAfterItemRecovered > 100) {
-            consumedJewelForStarlightStage = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / 10) * Math.floor(500 / formValue.maxStamina);
-            consumedJewelForTheaterDays = Math.ceil(requiredRecoveryStaminaAfterItemRecovered / formValue.maxStamina) * 50;
+        if (requiredRecoveryStamina > 0) {
+            consumedJewelForStarlightStage = Math.ceil(requiredRecoveryStamina / 10) * Math.floor(500 / formValue.maxStamina);
+            consumedJewelForTheaterDays = Math.ceil(requiredRecoveryStamina / formValue.maxStamina) * 50;
         }
 
         // 表示
